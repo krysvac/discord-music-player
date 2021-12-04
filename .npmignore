@@ -10,3 +10,4 @@ tsconfig.json
 docs
 jsdoc.json
 dmp-ts.iml
+.editorconfig
