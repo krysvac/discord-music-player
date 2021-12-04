@@ -1,6 +1,18 @@
 {
+  "env": {
+    "node": true,
+    "mocha": true,
+    "es6": true
+  },
   "root": true,
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true
+    },
+    "project": ["tsconfig.json"]
+  },
   "plugins": [
     "@typescript-eslint"
   ],
@@ -8,5 +20,30 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended"
-  ]
+  ],
+  "rules": {
+    "max-len": "off",
+    "no-underscore-dangle": "off",
+    "@typescript-eslint/explicit-member-accessibility": [
+      "error",
+      {
+        "accessibility": "explicit",
+        "overrides": {
+          "accessors": "explicit",
+          "constructors": "no-public",
+          "methods": "explicit",
+          "properties": "explicit",
+          "parameterProperties": "explicit"
+        }
+      }
+    ],
+    "object-curly-spacing": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/member-ordering": ["error"],
+    "no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": [
+      "error",
+      "allow": ["private-constructors"]
+    ]
+  }
 }
