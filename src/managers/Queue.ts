@@ -147,7 +147,7 @@ export class Queue {
         this.isPlaying = true;
         if (resource?.metadata?.isFirst && resource?.metadata?.seekTime === 0) this.player.emit('songFirst', this, this.nowPlaying);
       })
-      .on('end', async (resource) => {
+      .on('end', async (_) => {
         if (this.destroyed) {
           this.player.emit('queueDestroyed', this);
           return;
@@ -207,21 +207,33 @@ export class Queue {
 
     const songLength = this.songs.length;
     if (!options?.immediate && songLength !== 0) {
-      if (options.index! >= 0 && ++options.index! <= songLength) this.songs.splice(options.index!, 0, song);
-      else this.songs.push(song);
+      if (options.index! >= 0 && ++options.index! <= songLength) {
+        this.songs.splice(options.index!, 0, song);
+      }
+      else {
+        this.songs.push(song);
+      }
       this.player.emit('songAdd', this, song);
       return song;
     }
     if (!options?.immediate) {
       song.setFirst();
-      if (options.index! >= 0 && ++options.index! <= songLength) this.songs.splice(options.index!, 0, song);
-      else this.songs.push(song);
+      if (options.index! >= 0 && ++options.index! <= songLength) {
+        this.songs.splice(options.index!, 0, song);
+      }
+      else {
+        this.songs.push(song);
+      }
       this.player.emit('songAdd', this, song);
-    } else if (options.seek) this.songs[0].seekTime = options.seek;
+    } else if (options.seek) {
+      this.songs[0].seekTime = options.seek;
+    }
 
     const {quality} = this.options;
     song = this.songs[0];
-    if (song.seekTime) options.seek = song.seekTime;
+    if (song.seekTime) {
+      options.seek = song.seekTime;
+    }
 
     const stream = ytdl(song.url, {
       requestOptions: this.player.options.ytdlRequestOptions ?? {},

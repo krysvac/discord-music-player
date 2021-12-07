@@ -1,7 +1,7 @@
 # Discord Music Player
 ![npm](https://img.shields.io/npm/dt/discord-music-player-custom?style=for-the-badge)
 ![npm](https://img.shields.io/npm/v/discord-music-player-custom?style=for-the-badge)
-![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/krysvac/discord-music-player?color=%2348aaf1&style=for-the-badge)
+![CodeFactor Grade](https://www.codefactor.io/repository/github/krysvac/discord-music-player/badge?color=%2348aaf1&style=for-the-badge)
 
 ### Note: This is the v8 version of Discord Music Player for Discord.JS v13!
 

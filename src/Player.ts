@@ -93,7 +93,7 @@ export class Player extends EventEmitter {
   }
 
   /**
-   * Deletes the guild queue.
+   * Sets the guild queue.
    * @param {Snowflake} guildId
    * @param {Queue} queue
    * @returns {void}

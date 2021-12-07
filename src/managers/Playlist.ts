@@ -8,6 +8,7 @@ export class Playlist {
   public author: string;
   public url: string;
   public songs: Song[];
+  public requestedBy?: User;
 
   /**
    * Playlist constructor
@@ -18,14 +19,14 @@ export class Playlist {
   constructor(raw: RawPlaylist, queue: Queue, requestedBy?: User) {
 
     /**
-     * Playlist instance
+     * Player instance
      * @name Playlist#player
      * @type {Player}
      * @readonly
      */
 
     /**
-     * Playlist instance
+     * Playlist queue
      * @name Playlist#queue
      * @type {Queue}
      */
@@ -54,6 +55,12 @@ export class Playlist {
      * @type {string}
      */
 
+    /**
+     * Playlist requested by user
+     * @name Playlist#requestedBy
+     * @type {User}
+     */
+
     this.player = queue.player;
 
     this.queue = queue;
@@ -65,6 +72,8 @@ export class Playlist {
     this.url = raw.url;
 
     this.songs = raw.songs;
+
+    this.requestedBy = requestedBy;
   }
 
   /**

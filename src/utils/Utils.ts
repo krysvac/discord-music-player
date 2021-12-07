@@ -260,7 +260,7 @@ export class Utils {
   public static timeToMs(duration: string): number {
     return duration.split(':')
       .reduceRight(
-        (prev, curr, i, arr) => prev + parseInt(curr) * 60 ** (arr.length - 1 - i), 0
+        (prev, curr, i, arr) => prev + parseInt(curr, 10) * 60 ** (arr.length - 1 - i), 0
       ) * 1000;
   }
 
