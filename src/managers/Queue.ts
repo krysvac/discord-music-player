@@ -229,8 +229,7 @@ export class Queue {
     if (!options?.immediate && songLength !== 0) {
       if (options.index! >= 0 && ++options.index! <= songLength) {
         this.songs.splice(options.index!, 0, song);
-      }
-      else {
+      } else {
         this.songs.push(song);
       }
       this.player.emit('songAdd', this, song);
@@ -240,8 +239,7 @@ export class Queue {
       song.setFirst();
       if (options.index! >= 0 && ++options.index! <= songLength) {
         this.songs.splice(options.index!, 0, song);
-      }
-      else {
+      } else {
         this.songs.push(song);
       }
       this.player.emit('songAdd', this, song);
@@ -274,11 +272,8 @@ export class Queue {
       inputType: StreamType.Raw,
     });
 
-    setTimeout(() => {
-      this.connection!.playAudioStream(resource)
-        .then(() => {
-          this.setVolume(this.options.volume!);
-        });
+    await this.connection!.playAudioStream(resource).then(() => {
+      this.setVolume(this.options.volume!);
     });
 
     return song;
