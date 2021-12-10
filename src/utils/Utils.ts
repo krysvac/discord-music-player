@@ -199,7 +199,7 @@ export class Utils {
           author: video.channel!.name,
           isLive: video.isLive,
           thumbnail: video.thumbnails.best!,
-        }, Queue, SOptions.requestedBy);
+        }, Queue, SOptions.requestedBy, SOptions.playNext);
         song.data = SOptions.data;
         return song;
       })
@@ -333,7 +333,7 @@ export class Utils {
           author: item.author!.name,
           isLive: item.isLive,
           thumbnail: item.bestThumbnail.url!,
-        } as RawSong, Queue, SOptions.requestedBy);
+        } as RawSong, Queue, SOptions.requestedBy, SOptions.playNext);
       }).filter(I => I);
 
       return songs as Song[];
@@ -402,7 +402,7 @@ export class Utils {
         isLive: VideoResult.isLiveContent,
         thumbnail: VideoResult.thumbnails.best,
         seekTime: SOptions.timecode && VideoTimecode ? Number(VideoTimecode) * 1000 : null,
-      } as RawSong, Queue, SOptions.requestedBy);
+      } as RawSong, Queue, SOptions.requestedBy, SOptions.playNext);
     } else return null;
   }
 

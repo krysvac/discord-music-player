@@ -14,14 +14,16 @@ export class Song {
   public isFirst: boolean;
   public seekTime: number;
   public data?: any = null;
+  public type: string;
 
   /**
    * Song constructor
    * @param {RawSong} raw
    * @param {Queue} queue
    * @param {User} [requestedBy]
+   * @param {boolean} playNext
    */
-  constructor(raw: RawSong, queue: Queue, requestedBy?: User) {
+  constructor(raw: RawSong, queue: Queue, requestedBy?: User, playNext?: boolean) {
 
     /**
      * Player instance
@@ -98,6 +100,12 @@ export class Song {
      * @type {any}
      */
 
+    /**
+     * Song type, regular if queued regularly or playNext if queued as playNext
+     * @name Song#type
+     * @type {string}
+     */
+
     this.player = queue.player;
 
     this.queue = queue;
@@ -121,6 +129,8 @@ export class Song {
     this.seekTime = raw.seekTime ?? 0;
 
     this.data = null;
+
+    this.type = playNext ? 'playNext' : 'regular';
   }
 
   /**

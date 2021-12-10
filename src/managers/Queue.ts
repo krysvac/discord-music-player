@@ -24,6 +24,7 @@ import {
   DefaultPlayOptions,
   DefaultPlaylistOptions,
 } from '..';
+import _ from 'lodash';
 
 export class Queue {
   public player: Player;
@@ -206,6 +207,25 @@ export class Queue {
     if (!options.immediate) song.data = data;
 
     const songLength = this.songs.length;
+
+    if (options.playNext) {
+      if (songLength === 0) { // If we have no songs then do nothing since it's the same as just playing normally
+      } else { // If we have some songs already
+        const indexOfLastPn = _.findLastIndex(this.songs, song => {
+          return song.type === 'playNext';
+        });
+
+        if (indexOfLastPn === -1) { // No pn songs at all, add to top of array after current song
+          options.index = 1;
+        } else { // One or more pn songs exist
+          if (indexOfLastPn === songLength - 1) { // If the last pn song is the last item of the array, add the song regularly
+          } else {
+            options.index = indexOfLastPn + 1;
+          }
+        }
+      }
+    }
+
     if (!options?.immediate && songLength !== 0) {
       if (options.index! >= 0 && ++options.index! <= songLength) {
         this.songs.splice(options.index!, 0, song);
@@ -283,7 +303,28 @@ export class Queue {
         throw new DMPError(error);
       });
     const songLength = this.songs.length;
-    this.songs.push(...playlist.songs);
+
+    if (options.playNext) {
+      if (songLength === 0) { // If we have no songs then add the pn songs regularly since it doesn't matter
+        this.songs.push(...playlist.songs);
+      } else { // If we have some songs already
+        const indexOfLastPn = _.findLastIndex(this.songs, song => {
+          return song.type === 'playNext';
+        });
+
+        if (indexOfLastPn === -1) { // No pn songs at all, add to top of array after current song
+          this.songs.splice(1, 0, ...playlist.songs);
+        } else { // One or more pn songs exist
+          if (indexOfLastPn === songLength - 1) { // If the last pn song is the last item of the array, add the songs regularly
+            this.songs.push(...playlist.songs);
+          } else {
+            this.songs.splice(indexOfLastPn + 1, 0, ...playlist.songs);
+          }
+        }
+      }
+    } else {
+      this.songs.push(...playlist.songs);
+    }
     this.player.emit('playlistAdd', this, playlist);
 
     if (songLength === 0) {
