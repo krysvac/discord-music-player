@@ -216,11 +216,11 @@ export class Queue {
         });
 
         if (indexOfLastPn === -1) { // No pn songs at all, add to top of array after current song
-          options.index = 1;
+          options.index = 0;
         } else { // One or more pn songs exist
           if (indexOfLastPn === songLength - 1) { // If the last pn song is the last item of the array, add the song regularly
           } else {
-            options.index = indexOfLastPn + 1;
+            options.index = indexOfLastPn;
           }
         }
       }
