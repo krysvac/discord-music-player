@@ -37,7 +37,8 @@ export interface PlayerOptions {
  * @param {number} [index] If the index was provided, it will add the song after the provided index in the Queue
  * @param {User} [requestedBy] The User who requested the Song
  * @param {string} [localAddress] Custom ipv4/ipv6 address
- * @param {boolean} [playNext] Whether to queue this song as playNext or not (works like spotify queue)
+ * @param {boolean} [playNext] Whether to queue this song as playNext
+ * @param {boolean} [addToEndOfPn] Whether to add this song to the end of the current playNext songs, or on top of all songs
  */
 export interface PlayOptions {
   uploadDate?: 'hour' | 'today' | 'week' | 'month' | 'year',
@@ -47,7 +48,8 @@ export interface PlayOptions {
   index?: number;
   requestedBy?: User,
   localAddress?: string,
-  playNext?: boolean
+  playNext?: boolean,
+  addToEndOfPn?: boolean
 }
 
 /**
@@ -58,13 +60,15 @@ export interface PlayOptions {
  * @param {boolean} [shuffle=false] If it should shuffle the Songs
  * @param {string} [localAddress] Custom ipv4/ipv6 address
  * @param {boolean} [playNext] Whether to queue this song as playNext or not (works like spotify queue)
+ * @param {boolean} [addToEndOfPn] Whether to add this song to the end of the current playNext songs, or on top of all songs
  */
 export interface PlaylistOptions {
   maxSongs?: number,
   requestedBy?: User,
   shuffle?: boolean,
   localAddress?: string,
-  playNext?: boolean
+  playNext?: boolean,
+  addToEndOfPn?: boolean
 }
 
 /**

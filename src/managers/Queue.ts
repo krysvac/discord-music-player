@@ -211,17 +211,21 @@ export class Queue {
     if (options.playNext) {
       if (songLength === 0) { // If we have no songs then do nothing since it's the same as just playing normally
       } else { // If we have some songs already
-        const indexOfLastPn = _.findLastIndex(this.songs, song => {
-          return song.type === 'playNext';
-        });
+        if (options.addToEndOfPn) {
+          const indexOfLastPn = _.findLastIndex(this.songs, song => {
+            return song.type === 'playNext';
+          });
 
-        if (indexOfLastPn === -1) { // No pn songs at all, add to top of array after current song
-          options.index = 0;
-        } else { // One or more pn songs exist
-          if (indexOfLastPn === songLength - 1) { // If the last pn song is the last item of the array, add the song regularly
-          } else {
-            options.index = indexOfLastPn;
+          if (indexOfLastPn === -1) { // No pn songs at all, add to top of array after current song
+            options.index = 0;
+          } else { // One or more pn songs exist
+            if (indexOfLastPn === songLength - 1) { // If the last pn song is the last item of the array, add the song regularly
+            } else {
+              options.index = indexOfLastPn;
+            }
           }
+        } else {
+          options.index = 0;
         }
       }
     }
@@ -303,18 +307,22 @@ export class Queue {
       if (songLength === 0) { // If we have no songs then add the pn songs regularly since it doesn't matter
         this.songs.push(...playlist.songs);
       } else { // If we have some songs already
-        const indexOfLastPn = _.findLastIndex(this.songs, song => {
-          return song.type === 'playNext';
-        });
+        if (options.addToEndOfPn) {
+          const indexOfLastPn = _.findLastIndex(this.songs, song => {
+            return song.type === 'playNext';
+          });
 
-        if (indexOfLastPn === -1) { // No pn songs at all, add to top of array after current song
-          this.songs.splice(1, 0, ...playlist.songs);
-        } else { // One or more pn songs exist
-          if (indexOfLastPn === songLength - 1) { // If the last pn song is the last item of the array, add the songs regularly
-            this.songs.push(...playlist.songs);
-          } else {
-            this.songs.splice(indexOfLastPn + 1, 0, ...playlist.songs);
+          if (indexOfLastPn === -1) { // No pn songs at all, add to top of array after current song
+            this.songs.splice(1, 0, ...playlist.songs);
+          } else { // One or more pn songs exist
+            if (indexOfLastPn === songLength - 1) { // If the last pn song is the last item of the array, add the songs regularly
+              this.songs.push(...playlist.songs);
+            } else {
+              this.songs.splice(indexOfLastPn + 1, 0, ...playlist.songs);
+            }
           }
+        } else { // add on top of any queued songs
+          this.songs.splice(1, 0, ...playlist.songs);
         }
       }
     } else {

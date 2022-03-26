@@ -15,15 +15,17 @@ export class Song {
   public seekTime: number;
   public data?: any = null;
   public type: string;
+  public addToEndOfPn? = false;
 
   /**
    * Song constructor
    * @param {RawSong} raw
    * @param {Queue} queue
    * @param {User} [requestedBy]
-   * @param {boolean} playNext
+   * @param {boolean} playNext If the song was added as part of the playNext queue
+   * @param {boolean} addToEndOfPn If the song was added to the start of end of the playNext queue
    */
-  constructor(raw: RawSong, queue: Queue, requestedBy?: User, playNext?: boolean) {
+  constructor(raw: RawSong, queue: Queue, requestedBy?: User, playNext?: boolean, addToEndOfPn?: boolean) {
 
     /**
      * Player instance
@@ -106,6 +108,12 @@ export class Song {
      * @type {string}
      */
 
+    /**
+     * If the song was added to the start of end of the playNext queue
+     * @name Song#addToEndOfPn
+     * @type {boolean}
+     */
+
     this.player = queue.player;
 
     this.queue = queue;
@@ -131,6 +139,8 @@ export class Song {
     this.data = null;
 
     this.type = playNext ? 'playNext' : 'regular';
+
+    this.addToEndOfPn = addToEndOfPn;
   }
 
   /**
