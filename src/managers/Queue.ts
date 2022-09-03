@@ -1,4 +1,5 @@
 import {
+  ChannelType,
   Guild, GuildChannelResolvable, StageChannel, VoiceChannel,
 } from 'discord.js';
 import {
@@ -122,7 +123,7 @@ export class Queue {
     if (this.connection) return this;
     const channel = this.guild.channels.resolve(channelId) as StageChannel | VoiceChannel;
     if (!channel) throw new DMPError(DMPErrors.UNKNOWN_VOICE);
-    if (!channel.isVoice()) throw new DMPError(DMPErrors.CHANNEL_TYPE_INVALID);
+    if (channel.type !== ChannelType.GuildVoice) throw new DMPError(DMPErrors.CHANNEL_TYPE_INVALID);
     let connection = joinVoiceChannel({
       guildId: channel.guild.id,
       channelId: channel.id,
@@ -138,10 +139,6 @@ export class Queue {
       throw new DMPError(DMPErrors.VOICE_CONNECTION_ERROR);
     }
     this.connection = _connection;
-
-    if (channel.type === 'GUILD_STAGE_VOICE') {
-      await channel.guild.me!.voice.setSuppressed(false).catch(async () => await channel!.guild.me!.voice.setRequestToSpeak(true).catch(() => null));
-    }
 
     this.connection
       .on('start', (resource) => {

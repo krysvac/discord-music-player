@@ -3,7 +3,9 @@
 ![npm](https://img.shields.io/npm/v/discord-music-player-custom?style=for-the-badge)
 ![CodeFactor Grade](https://www.codefactor.io/repository/github/krysvac/discord-music-player/badge?color=%2348aaf1&style=for-the-badge)
 
-### Note: This is the v8 version of Discord Music Player for Discord.JS v13!
+## This is forked from https://github.com/SushiBtw/discord-music-player and customized to fit my needs
+
+### Note: This is the v9 version of Discord Music Player for Discord.JS v14!
 
 Discord Music Player is a powerful [Node.js](https://nodejs.org) module that allows you to easily implement music commands.
 **Everything** is customizable, and everything can be done using this package - **there are no limitations!**
@@ -12,7 +14,7 @@ This package supports YouTube Videos & Playlists, Spotify Songs & Playlists, App
 Package from version v7.0.0 is fully maintained by [SushiBtw](https://github.com/SushiBtw).
 
 ### Requirements:
-- [Discord.js v13](https://www.npmjs.com/package/discord.js),
+- [Discord.js v14](https://www.npmjs.com/package/discord.js),
 - [Node.JS v16](https://nodejs.org/),
 
 # Installation

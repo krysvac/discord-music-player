@@ -47,7 +47,6 @@ export interface PlayOptions {
   timecode?: boolean,
   index?: number;
   requestedBy?: User,
-  localAddress?: string,
   playNext?: boolean,
   addToEndOfPn?: boolean
 }

@@ -5,9 +5,9 @@ import {
   RawSong, RawPlaylist,
 } from "..";
 import YTSR, {Video} from 'ytsr';
-import {getData, getPreview} from "spotify-url-info";
-import {getSong, getPlaylist} from "./AppleUtils";
+import spotify from "spotify-url-info";
 import {Client, Video as IVideo, VideoCompact, Playlist as IPlaylist} from "youtubei";
+import fetch from 'isomorphic-unfetch';
 
 let YouTube = new Client();
 
@@ -19,9 +19,7 @@ export class Utils {
     YouTubePlaylist: /^((?:https?:)\/\/)?((?:www|m)\.)?((?:youtube\.com)).*(youtu.be\/|list=)([^#&?]*).*/,
     YouTubePlaylistID: /[&?]list=([^&]+)/,
     Spotify: /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:track\/|\?uri=spotify:track:)((\w|-)+)(?:(?=\?)(?:[?&]foo=(\d*)(?=[&#]|$)|(?![?&]foo=)[^#])+)?(?=#|$)/,
-    SpotifyPlaylist: /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|playlist)\/|\?uri=spotify:playlist:)((\w|-)+)(?:(?=\?)(?:[?&]foo=(\d*)(?=[&#]|$)|(?![?&]foo=)[^#])+)?(?=#|$)/,
-    Apple: /https?:\/\/music\.apple\.com\/.+?\/.+?\/(.+?)\//,
-    ApplePlaylist: /https?:\/\/music\.apple\.com\/.+?\/.+?\/(.+?)\//,
+    SpotifyPlaylist: /https?:\/\/(?:embed\.|open\.)(?:spotify\.com\/)(?:(album|playlist)\/|\?uri=spotify:playlist:)((\w|-)+)(?:(?=\?)(?:[?&]foo=(\d*)(?=[&#]|$)|(?![?&]foo=)[^#])+)?(?=#|$)/
   }
 
   /**
@@ -75,50 +73,9 @@ export class Utils {
       this.regexList.SpotifyPlaylist.test(Search);
     const YouTubePlaylistLink =
       this.regexList.YouTubePlaylist.test(Search);
-    const ApplePlaylistLink =
-      this.regexList.ApplePlaylist.test(Search);
 
-    if (ApplePlaylistLink) {
-      const AppleResultData = await getPlaylist(Search).catch(() => null);
-      if (!AppleResultData)
-        throw DMPErrors.INVALID_PLAYLIST;
-
-      const AppleResult: RawPlaylist = {
-        name: AppleResultData.name,
-        author: AppleResultData.author,
-        url: Search,
-        songs: [],
-        type: AppleResultData.type
-      }
-
-      AppleResult.songs = (
-        await Promise.all(
-          AppleResultData.tracks.map(async (track, index) => {
-            if (Limit !== -1 && index >= Limit)
-              return null;
-            const Result = await this.search(
-              `${track.artist} - ${track.title}`,
-              SOptions,
-              Queue
-            ).catch(() => null);
-            if (Result && Result[0]) {
-              Result[0].data = SOptions.data;
-              return Result[0];
-            } else return null;
-          })
-        )
-      )
-        .filter((V): V is Song => V !== null);
-
-      if (AppleResult.songs.length === 0)
-        throw DMPErrors.INVALID_PLAYLIST;
-
-      if (SOptions.shuffle)
-        AppleResult.songs = this.shuffle(AppleResult.songs);
-
-      return new Playlist(AppleResult, Queue, SOptions.requestedBy);
-    } else if (SpotifyPlaylistLink) {
-      const SpotifyResultData = await getData(Search).catch(() => null);
+    if (SpotifyPlaylistLink) {
+      const SpotifyResultData = await spotify(fetch).getData(Search).catch(() => null);
       if (!SpotifyResultData || !['playlist', 'album'].includes(SpotifyResultData.type))
         throw DMPErrors.INVALID_PLAYLIST;
 
@@ -169,11 +126,7 @@ export class Utils {
       if (!PlaylistID)
         throw DMPErrors.INVALID_PLAYLIST;
 
-      YouTube = new Client({
-        requestOptions: {
-          localAddress: SOptions.localAddress
-        }
-      });
+      YouTube = new Client();
       const YouTubeResultData = await YouTube.getPlaylist(PlaylistID);
       if (!YouTubeResultData || Object.keys(YouTubeResultData).length === 0)
         throw DMPErrors.INVALID_PLAYLIST;
@@ -187,9 +140,9 @@ export class Utils {
       }
 
       if (YouTubeResultData instanceof IPlaylist && YouTubeResultData.videoCount > 100 && (Limit === -1 || Limit > 100))
-        await YouTubeResultData.next(Math.floor((Limit === -1 || Limit > YouTubeResultData.videoCount ? YouTubeResultData.videoCount : Limit - 1) / 100));
+        await YouTubeResultData.videos.next(Math.floor((Limit === -1 || Limit > YouTubeResultData.videoCount ? YouTubeResultData.videoCount : Limit - 1) / 100));
 
-      YouTubeResult.songs = YouTubeResultData.videos.map((video: VideoCompact, index: number) => {
+      YouTubeResult.songs = (YouTubeResultData.videos as VideoCompact[]).map((video: VideoCompact, index: number) => {
         if (Limit !== -1 && index >= Limit)
           return null;
         const song = new Song({
@@ -355,24 +308,10 @@ export class Utils {
       this.regexList.Spotify.test(Search);
     const YouTubeLink =
       this.regexList.YouTubeVideo.test(Search);
-    const AppleLink =
-      this.regexList.Apple.test(Search);
 
-    if (AppleLink) {
+    if (SpotifyLink) {
       try {
-        const AppleResult = await getSong(Search);
-        const SearchResult = await this.search(
-          `${AppleResult.artist} - ${AppleResult.title}`,
-          SOptions,
-          Queue
-        );
-        return SearchResult[0];
-      } catch (e) {
-        throw DMPErrors.INVALID_APPLE;
-      }
-    } else if (SpotifyLink) {
-      try {
-        const SpotifyResult = await getPreview(Search);
+        const SpotifyResult = await spotify(fetch).getPreview(Search);
         const SearchResult = await this.search(
           `${SpotifyResult.artist} - ${SpotifyResult.title}`,
           SOptions,
@@ -385,11 +324,7 @@ export class Utils {
     } else if (YouTubeLink) {
       const VideoID = this.parseVideo(Search);
       if (!VideoID) throw DMPErrors.SEARCH_NULL;
-      YouTube = new Client({
-        requestOptions: {
-          localAddress: SOptions.localAddress
-        }
-      });
+      YouTube = new Client();
       const VideoResult = await YouTube.getVideo(VideoID) as IVideo;
       if (!VideoResult) throw DMPErrors.SEARCH_NULL;
       const VideoTimecode = this.parseVideoTimecode(Search);
