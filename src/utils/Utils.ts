@@ -5,7 +5,6 @@ import {
   RawSong, RawPlaylist,
 } from "..";
 import YTSR, {Video} from 'ytsr';
-import {getData, getPreview} from "spotify-url-info";
 import {getSong, getPlaylist} from "./AppleUtils";
 import {Client, Video as IVideo, VideoCompact, Playlist as IPlaylist} from "youtubei";
 
@@ -118,6 +117,10 @@ export class Utils {
 
       return new Playlist(AppleResult, Queue, SOptions.requestedBy);
     } else if (SpotifyPlaylistLink) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const fetch = require('isomorphic-unfetch');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { getData } = require('spotify-url-info')(fetch)
       const SpotifyResultData = await getData(Search).catch(() => null);
       if (!SpotifyResultData || !['playlist', 'album'].includes(SpotifyResultData.type))
         throw DMPErrors.INVALID_PLAYLIST;
@@ -169,11 +172,7 @@ export class Utils {
       if (!PlaylistID)
         throw DMPErrors.INVALID_PLAYLIST;
 
-      YouTube = new Client({
-        requestOptions: {
-          localAddress: SOptions.localAddress
-        }
-      });
+      YouTube = new Client();
       const YouTubeResultData = await YouTube.getPlaylist(PlaylistID);
       if (!YouTubeResultData || Object.keys(YouTubeResultData).length === 0)
         throw DMPErrors.INVALID_PLAYLIST;
@@ -187,9 +186,9 @@ export class Utils {
       }
 
       if (YouTubeResultData instanceof IPlaylist && YouTubeResultData.videoCount > 100 && (Limit === -1 || Limit > 100))
-        await YouTubeResultData.next(Math.floor((Limit === -1 || Limit > YouTubeResultData.videoCount ? YouTubeResultData.videoCount : Limit - 1) / 100));
+        await YouTubeResultData.videos.next(Math.floor((Limit === -1 || Limit > YouTubeResultData.videoCount ? YouTubeResultData.videoCount : Limit - 1) / 100));
 
-      YouTubeResult.songs = YouTubeResultData.videos.map((video: VideoCompact, index: number) => {
+      YouTubeResult.songs = (YouTubeResultData.videos as VideoCompact[]).map((video: VideoCompact, index: number) => {
         if (Limit !== -1 && index >= Limit)
           return null;
         const song = new Song({
@@ -372,6 +371,10 @@ export class Utils {
       }
     } else if (SpotifyLink) {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const fetch = require('isomorphic-unfetch');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { getPreview } = require('spotify-url-info')(fetch)
         const SpotifyResult = await getPreview(Search);
         const SearchResult = await this.search(
           `${SpotifyResult.artist} - ${SpotifyResult.title}`,
@@ -385,11 +388,7 @@ export class Utils {
     } else if (YouTubeLink) {
       const VideoID = this.parseVideo(Search);
       if (!VideoID) throw DMPErrors.SEARCH_NULL;
-      YouTube = new Client({
-        requestOptions: {
-          localAddress: SOptions.localAddress
-        }
-      });
+      YouTube = new Client();
       const VideoResult = await YouTube.getVideo(VideoID) as IVideo;
       if (!VideoResult) throw DMPErrors.SEARCH_NULL;
       const VideoTimecode = this.parseVideoTimecode(Search);
